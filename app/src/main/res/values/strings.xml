@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">KomootTestTask</string>
+    <string name="location_permission_error_msg">This app can\'t work without this permission. Please grant it.</string>
+    <string name="general_error">Something goes wrong.</string>
+</resources>

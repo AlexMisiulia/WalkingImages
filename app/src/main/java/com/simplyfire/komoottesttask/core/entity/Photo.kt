@@ -1,8 +1,14 @@
 package com.simplyfire.komoottesttask.core.entity
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
 data class Photo(
-    val farm: Int = 0,
+    @PrimaryKey
     val id: String = "",
+
+    val farm: Int = 0,
     val isfamily: Int = 0,
     val isfriend: Int = 0,
     val ispublic: Int = 0,

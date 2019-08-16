@@ -7,6 +7,8 @@ buildscript {
         glide_version = '4.9.0'
         dagger_version = '2.16'
         lifecycle_version = '2.0.0'
+        room_version = '2.1.0'
+        rxandroid_version = '2.1.1'
     }
     repositories {
         google()

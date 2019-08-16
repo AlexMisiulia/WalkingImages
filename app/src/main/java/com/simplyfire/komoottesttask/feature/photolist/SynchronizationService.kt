@@ -28,7 +28,7 @@ class SynchronizationService : Service() {
     lateinit var photoRepository: PhotoRepository
 
     private val locationListener = createLocationListener {
-        photoRepository.searchPhotos(it.latitude.toString(), it.longitude.toString())
+        photoRepository.searchPhoto(it.latitude.toString(), it.longitude.toString())
     }
 
     private fun runAsForeground() {

@@ -8,11 +8,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.simplyfire.komoottesttask.R
 import com.simplyfire.komoottesttask.core.di.Injector
+import com.simplyfire.komoottesttask.core.di.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 777
 private const val TAG = "PhotoListActivity"
@@ -20,14 +24,25 @@ private const val TAG = "PhotoListActivity"
 class PhotoListActivity : AppCompatActivity() {
     private val adapter = PhotoAdapter()
 
+    @Inject lateinit var viewModelFactory: ViewModelFactory<PhotoListViewModel>
+    private lateinit var viewModel: PhotoListViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Injector.appComponent.inject(this)
 
         initView()
+        initViewModel()
 
         checkLocationPermission()
+    }
+
+    private fun initViewModel() {
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(PhotoListViewModel::class.java)
+        viewModel.viewState.observe(this, Observer {
+            adapter.submitList(it.photos)
+        })
     }
 
     private fun initView() {

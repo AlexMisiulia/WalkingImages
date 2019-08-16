@@ -1,20 +1,26 @@
 package com.simplyfire.komoottesttask.core.data
 
-import com.simplyfire.komoottesttask.core.entity.SearchPhotosResponse
+import androidx.lifecycle.LiveData
+import com.simplyfire.komoottesttask.core.data.db.PhotosDao
+import com.simplyfire.komoottesttask.core.entity.Photo
 import com.simplyfire.komoottesttask.core.network.FlickrApi
-import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class PhotoRepository @Inject constructor(private val flickrApi: FlickrApi) {
+class PhotoRepository @Inject constructor(private val flickrApi: FlickrApi, private val photosDao: PhotosDao) {
 
-    fun searchPhotos(latitude: String, longitude: String) : Observable<SearchPhotosResponse> {
-        return flickrApi.searchPhotos(latitude, longitude)
+    fun searchPhoto(latitude: String, longitude: String) {
+        flickrApi.searchPhotos(latitude, longitude)
+            .subscribeOn(Schedulers.io())
+            .subscribe { photoResponse ->
+                val closestPhoto = photoResponse.photos.photo.getOrNull(0)
+                if (closestPhoto != null) photosDao.insert(closestPhoto)
+            }
     }
 
-    fun observePhotos() {
-        // TODO add Room database
-        return
+    fun getPhotos(): LiveData<List<Photo>> {
+        return photosDao.getAllPhotos()
     }
 }

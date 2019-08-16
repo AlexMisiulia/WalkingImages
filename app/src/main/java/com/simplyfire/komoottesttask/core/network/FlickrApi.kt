@@ -1,7 +1,7 @@
 package com.simplyfire.komoottesttask.core.network
 
 import com.simplyfire.komoottesttask.core.entity.SearchPhotosResponse
-import io.reactivex.Observable
+import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -17,5 +17,5 @@ interface FlickrApi {
 
     @GET("?$GET_PHOTO_METHOD_QUERY&api_key=$API_KEY&$JSON_FORMAT_QUERY&extras=url_c")
     fun searchPhotos(@Query("lat")latitude: String, @Query("lon")longitude: String)
-    : Observable<SearchPhotosResponse>
+    : Single<SearchPhotosResponse>
 }

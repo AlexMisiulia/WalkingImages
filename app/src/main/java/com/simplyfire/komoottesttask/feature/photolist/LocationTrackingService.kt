@@ -20,6 +20,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 import android.app.PendingIntent
+import com.simplyfire.komoottesttask.R
+import com.simplyfire.komoottesttask.core.utils.formatDate
+import com.simplyfire.komoottesttask.core.utils.notificationFormat
+import java.util.*
 
 private const val NOTIFICATION_CHANNEL_ID = BuildConfig.APPLICATION_ID
 private const val NOTIFICATION_ID = 888
@@ -39,18 +43,24 @@ class LocationTrackingService : Service() {
         photoRepository.searchPhoto(it.latitude.toString(), it.longitude.toString())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onNext = {
-                updateNotification("Получено новое фото")
+                onReceivedPhoto()
             }, onError = { error ->
                 Log.e(TAG, "error during searching photos", error)
             })
     })
+
+    private fun onReceivedPhoto() {
+        val beautifiedDate = formatDate(Date(), notificationFormat)
+        val displayText = getString(R.string.notification_text, beautifiedDate)
+        updateNotification(displayText)
+    }
 
     private fun updateNotification(text: String) {
         notificationManager.notify(NOTIFICATION_ID, buildNotification(text = text))
     }
 
     private fun buildNotification(
-        title: String = getString(com.simplyfire.komoottesttask.R.string.notification_title),
+        title: String = getString(R.string.notification_title),
         text: String = "",
         initChannel : Boolean = false
     ): Notification {
@@ -67,7 +77,7 @@ class LocationTrackingService : Service() {
             .setContentTitle(title)
             .setContentText(text)
             .setContentIntent(contentIntent)
-            .setSmallIcon(com.simplyfire.komoottesttask.R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .build()
     }
 

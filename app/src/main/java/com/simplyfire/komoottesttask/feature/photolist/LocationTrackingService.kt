@@ -45,10 +45,17 @@ class LocationTrackingService : Service() {
     }
 
     private val locationListener = createLocationListener(onLocationChangedListener = {
-        searchPhotos(it)
+        searchPhoto(it)
     })
 
-    private fun searchPhotos(it: Location) {
+    override fun onCreate() {
+        super.onCreate()
+        Injector.appComponent.inject(this)
+        startForeground(NOTIFICATION_ID, buildNotification(initChannel = true))
+        locationTracker.observeLocationChanges(locationListener)
+    }
+
+    private fun searchPhoto(it: Location) {
         disposables += photoRepository.searchPhoto(it.latitude.toString(), it.longitude.toString())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onNext = {
@@ -98,13 +105,6 @@ class LocationTrackingService : Service() {
             NotificationManager.IMPORTANCE_NONE
         )
         notificationManager.createNotificationChannel(chan)
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        Injector.appComponent.inject(this)
-        startForeground(NOTIFICATION_ID, buildNotification(initChannel = true))
-        locationTracker.observeLocationChanges(locationListener)
     }
 
     override fun onBind(intent: Intent?): IBinder? {

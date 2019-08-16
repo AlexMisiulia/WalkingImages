@@ -20,9 +20,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 import android.app.PendingIntent
+import android.location.Location
 import com.simplyfire.komoottesttask.R
 import com.simplyfire.komoottesttask.core.utils.formatDate
 import com.simplyfire.komoottesttask.core.utils.notificationFormat
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import java.util.*
 
 private const val NOTIFICATION_CHANNEL_ID = BuildConfig.APPLICATION_ID
@@ -35,19 +38,25 @@ class LocationTrackingService : Service() {
     @Inject lateinit var photoRepository: PhotoRepository
     @Inject lateinit var locationTracker: LocationTracker
 
+    private val disposables = CompositeDisposable()
+
     private val notificationManager: NotificationManager by lazy {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
     private val locationListener = createLocationListener(onLocationChangedListener = {
-        photoRepository.searchPhoto(it.latitude.toString(), it.longitude.toString())
+        searchPhotos(it)
+    })
+
+    private fun searchPhotos(it: Location) {
+        disposables += photoRepository.searchPhoto(it.latitude.toString(), it.longitude.toString())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onNext = {
                 onReceivedPhoto()
             }, onError = { error ->
                 Log.e(TAG, "error during searching photos", error)
             })
-    })
+    }
 
     private fun onReceivedPhoto() {
         val beautifiedDate = formatDate(Date(), notificationFormat)
@@ -105,5 +114,6 @@ class LocationTrackingService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         locationTracker.removeLocationListener(locationListener)
+        disposables.clear()
     }
 }

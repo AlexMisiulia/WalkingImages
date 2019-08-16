@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.simplyfire.komoottesttask.core.data.PhotoRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import javax.inject.Inject
 
 private const val TAG = "PhotoListViewModel"
@@ -16,16 +17,14 @@ class PhotoListViewModel @Inject constructor(photoRepository: PhotoRepository) :
     private val disposables = CompositeDisposable()
 
     init {
-        disposables.add(
-            photoRepository.getPhotos()
+        disposables += photoRepository.getPhotos()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ photos ->
                 val displayablePhotoList = photos.map { DisplayablePhoto(it.url_c) }
                 _viewState.value = ViewState(displayablePhotoList)
-            }, {error ->
+            }, { error ->
                 throw RuntimeException(error)
             })
-        )
     }
 
     override fun onCleared() {

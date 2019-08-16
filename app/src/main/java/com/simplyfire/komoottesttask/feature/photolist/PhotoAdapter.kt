@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.simplyfire.komoottesttask.R
-import com.simplyfire.komoottesttask.utils.inflateAdapterView
+import com.simplyfire.komoottesttask.core.utils.inflateAdapterView
 
 private val diffUtilCallback =  object: DiffUtil.ItemCallback<DisplayablePhoto>() {
     override fun areItemsTheSame(oldItem: DisplayablePhoto, newItem: DisplayablePhoto): Boolean {

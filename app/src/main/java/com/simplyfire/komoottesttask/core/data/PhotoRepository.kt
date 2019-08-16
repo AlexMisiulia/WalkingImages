@@ -11,12 +11,15 @@ import javax.inject.Singleton
 @Singleton
 class PhotoRepository @Inject constructor(private val flickrApi: FlickrApi, private val photosDao: PhotosDao) {
 
-    fun searchPhoto(latitude: String, longitude: String) {
-        flickrApi.searchPhotos(latitude, longitude)
+    fun searchPhoto(latitude: String, longitude: String): Observable<Photo> {
+        return flickrApi.searchPhotos(latitude, longitude)
             .subscribeOn(Schedulers.io())
-            .subscribe { photoResponse ->
+            .flatMap { photoResponse ->
                 val closestPhoto = photoResponse.photos.photo.getOrNull(0)
-                if (closestPhoto != null) photosDao.insert(closestPhoto)
+                if(closestPhoto == null) return@flatMap Observable.empty<Photo>()
+
+                photosDao.insert(closestPhoto)
+                return@flatMap Observable.just(closestPhoto)
             }
     }
 

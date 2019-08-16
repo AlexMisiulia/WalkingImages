@@ -9,6 +9,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.simplyfire.komoottesttask.BuildConfig
@@ -17,18 +18,25 @@ import com.simplyfire.komoottesttask.core.di.Injector
 import com.simplyfire.komoottesttask.core.utils.createLocationListener
 import com.simplyfire.komoottesttask.core.utils.observeLocationChanges
 import com.simplyfire.komoottesttask.core.utils.removeLocationListener
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 
 private const val NOTIFICATION_CHANNEL_ID = BuildConfig.APPLICATION_ID
 private const val NOTIFICATIONS_CHANNEL_NAME = "Waling images service"
 
+private const val TAG = "SynchronizationService"
 class SynchronizationService : Service() {
     @Inject
     lateinit var photoRepository: PhotoRepository
 
     private val locationListener = createLocationListener {
         photoRepository.searchPhoto(it.latitude.toString(), it.longitude.toString())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onError = { error ->
+                Log.e(TAG, "error during searching photos", error)
+            })
     }
 
     private fun runAsForeground() {

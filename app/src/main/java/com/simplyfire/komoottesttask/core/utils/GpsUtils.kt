@@ -27,9 +27,13 @@ fun createLocationListener(onLocationChangedListener: (Location) -> Unit): Locat
             onLocationChangedListener(location)
         }
 
-        override fun onProviderDisabled(provider: String) {}
+        override fun onProviderDisabled(provider: String) {
 
-        override fun onProviderEnabled(provider: String) {}
+        }
+
+        override fun onProviderEnabled(provider: String) {
+
+        }
 
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
     }

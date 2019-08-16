@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">KomootTestTask</string>
     <string name="location_permission_error_msg">This app can\'t work without this permission. Please grant it.</string>
+    <string name="location_disabled_error_msg">Gps is turned off. Please turn it on.</string>
     <string name="general_error">Something goes wrong.</string>
     <string name="service_text">Walking with images is running</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
 </resources>

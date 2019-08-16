@@ -1,7 +1,7 @@
-package com.simplyfire.komoottesttask
+package com.simplyfire.komoottesttask.core.network
 
-import com.simplyfire.komoottesttask.entity.SearchPhotosResponse
-import retrofit2.Call
+import com.simplyfire.komoottesttask.core.entity.SearchPhotosResponse
+import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -16,6 +16,6 @@ private const val GET_PHOTO_METHOD_QUERY = "method=flickr.photos.search"
 interface FlickrApi {
 
     @GET("?$GET_PHOTO_METHOD_QUERY&api_key=$API_KEY&$JSON_FORMAT_QUERY&extras=url_c")
-    fun getPhotosForLocation(@Query("lat")latitude: String, @Query("lon")longitude: String)
-    : Call<SearchPhotosResponse>
+    fun searchPhotos(@Query("lat")latitude: String, @Query("lon")longitude: String)
+    : Observable<SearchPhotosResponse>
 }

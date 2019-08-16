@@ -1,4 +1,4 @@
-package com.simplyfire.komoottesttask.utils
+package com.simplyfire.komoottesttask.core.utils
 
 import android.view.LayoutInflater
 import android.view.View

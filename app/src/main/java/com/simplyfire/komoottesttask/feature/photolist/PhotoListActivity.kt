@@ -20,8 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.simplyfire.komoottesttask.R
 import com.simplyfire.komoottesttask.core.di.Injector
 import com.simplyfire.komoottesttask.core.di.ViewModelFactory
-import com.simplyfire.komoottesttask.core.utils.observeLocationChanges
-import com.simplyfire.komoottesttask.core.utils.removeLocationListener
+import com.simplyfire.komoottesttask.core.gps.LifecycleLocationListener
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
@@ -37,22 +36,7 @@ class PhotoListActivity : AppCompatActivity() {
 
     private lateinit var startStopMenuItem: MenuItem
 
-    private val locationListener = object: LocationListener {
-
-        override fun onLocationChanged(location: Location) {
-
-        }
-
-        override fun onProviderDisabled(provider: String) {
-            onGpsDisabled()
-        }
-
-        override fun onProviderEnabled(provider: String) {
-
-        }
-
-        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
-    }
+    private lateinit var lifecycleLocationListener: LifecycleLocationListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +45,28 @@ class PhotoListActivity : AppCompatActivity() {
 
         initView()
         initViewModel()
+        initLocationListener()
+    }
+
+    private fun initLocationListener() {
+        lifecycleLocationListener = LifecycleLocationListener(this, lifecycle, object : LocationListener {
+
+            override fun onLocationChanged(location: Location) {
+
+            }
+
+            override fun onProviderDisabled(provider: String) {
+                onGpsDisabled()
+            }
+
+            override fun onProviderEnabled(provider: String) {
+
+            }
+
+            override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+
+        })
+        lifecycleLocationListener.enable()
     }
 
     private fun initViewModel() {
@@ -175,15 +181,5 @@ class PhotoListActivity : AppCompatActivity() {
     private fun hasLocationPermission(): Boolean {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED
-    }
-
-    override fun onResume() {
-        super.onResume()
-        observeLocationChanges(locationListener)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        removeLocationListener(locationListener)
     }
 }

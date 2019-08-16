@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
@@ -20,54 +19,73 @@ import com.simplyfire.komoottesttask.core.utils.createLocationListener
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
-
+import android.app.PendingIntent
 
 private const val NOTIFICATION_CHANNEL_ID = BuildConfig.APPLICATION_ID
+private const val NOTIFICATION_ID = 888
 private const val NOTIFICATIONS_CHANNEL_NAME = "Waling images service"
 
 private const val TAG = "LocationTrackingService"
+
 class LocationTrackingService : Service() {
     @Inject lateinit var photoRepository: PhotoRepository
     @Inject lateinit var locationTracker: LocationTracker
 
+    private val notificationManager: NotificationManager by lazy {
+        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+
     private val locationListener = createLocationListener(onLocationChangedListener = {
         photoRepository.searchPhoto(it.latitude.toString(), it.longitude.toString())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = { error ->
+            .subscribeBy(onNext = {
+                updateNotification("Получено новое фото")
+            }, onError = { error ->
                 Log.e(TAG, "error during searching photos", error)
             })
     })
 
-    private fun runAsForeground() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            startMyOwnForeground()
-        else
-            startForeground(1, Notification())
+    private fun updateNotification(text: String) {
+        notificationManager.notify(NOTIFICATION_ID, buildNotification(text = text))
+    }
+
+    private fun buildNotification(
+        title: String = getString(com.simplyfire.komoottesttask.R.string.notification_title),
+        text: String = "",
+        initChannel : Boolean = false
+    ): Notification {
+        if (initChannel && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel()
+        }
+
+        val contentIntent = PendingIntent.getActivity(
+            this,
+            0,
+            Intent(this, PhotoListActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setContentIntent(contentIntent)
+            .setSmallIcon(com.simplyfire.komoottesttask.R.drawable.ic_launcher_foreground)
+            .build()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel() {
+        val chan = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID,
+            NOTIFICATIONS_CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_NONE
+        )
+        notificationManager.createNotificationChannel(chan)
     }
 
     override fun onCreate() {
         super.onCreate()
         Injector.appComponent.inject(this)
-        runAsForeground()
-
+        startForeground(NOTIFICATION_ID, buildNotification(initChannel = true))
         locationTracker.observeLocationChanges(locationListener)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun startMyOwnForeground() {
-        val chan = NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATIONS_CHANNEL_NAME, NotificationManager.IMPORTANCE_NONE)
-        chan.lightColor = Color.BLUE
-        chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        manager.createNotificationChannel(chan)
-
-        val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-        val notification = notificationBuilder.setOngoing(true)
-            .setContentTitle("App is running in background")
-            .setPriority(NotificationManager.IMPORTANCE_MIN)
-            .setCategory(Notification.CATEGORY_SERVICE)
-            .build()
-        startForeground(2, notification)
     }
 
     override fun onBind(intent: Intent?): IBinder? {

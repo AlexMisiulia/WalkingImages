@@ -14,7 +14,9 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme" tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".feature.photolist.PhotoListActivity">
+        <activity android:name=".feature.photolist.PhotoListActivity"
+                  android:launchMode="singleTop"
+        >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

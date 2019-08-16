@@ -11,7 +11,7 @@ import android.os.Bundle
 fun Context.observeLocationChanges(locationListener: LocationListener) {
     val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
     locationManager.requestLocationUpdates(
-        LocationManager.GPS_PROVIDER, 5000, 100F, locationListener
+        LocationManager.GPS_PROVIDER, 0, 100F, locationListener
     )
 }
 

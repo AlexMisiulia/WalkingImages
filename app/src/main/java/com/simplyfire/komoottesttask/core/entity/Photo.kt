@@ -5,9 +5,13 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Photo(
-    @PrimaryKey
-    val id: String = "",
+    // so lazy to create several tables with relationships
+    // for cases when user return to the same place during the walk and receive the same photo once again
+    // just create increment pkeyId for now
+    @PrimaryKey(autoGenerate = true)
+    val pkeyId: Int = 0,
 
+    val id: String = "",
     val farm: Int = 0,
     val isfamily: Int = 0,
     val isfriend: Int = 0,

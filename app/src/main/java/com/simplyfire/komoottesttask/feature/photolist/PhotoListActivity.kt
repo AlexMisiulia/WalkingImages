@@ -3,8 +3,6 @@ package com.simplyfire.komoottesttask.feature.photolist
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationListener
 import android.os.Bundle
 import android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS
 import android.view.Menu
@@ -21,6 +19,8 @@ import com.simplyfire.komoottesttask.R
 import com.simplyfire.komoottesttask.core.di.Injector
 import com.simplyfire.komoottesttask.core.di.ViewModelFactory
 import com.simplyfire.komoottesttask.core.gps.LifecycleLocationListener
+import com.simplyfire.komoottesttask.core.gps.LocationTracker
+import com.simplyfire.komoottesttask.core.utils.createLocationListener
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
@@ -32,6 +32,7 @@ class PhotoListActivity : AppCompatActivity() {
     private val adapter = PhotoAdapter()
 
     @Inject lateinit var viewModelFactory: ViewModelFactory<PhotoListViewModel>
+    @Inject lateinit var locationTracker: LocationTracker
     private lateinit var viewModel: PhotoListViewModel
 
     private lateinit var startStopMenuItem: MenuItem
@@ -49,24 +50,11 @@ class PhotoListActivity : AppCompatActivity() {
     }
 
     private fun initLocationListener() {
-        lifecycleLocationListener = LifecycleLocationListener(this, lifecycle, object : LocationListener {
-
-            override fun onLocationChanged(location: Location) {
-
-            }
-
-            override fun onProviderDisabled(provider: String) {
+        lifecycleLocationListener = LifecycleLocationListener(locationTracker, lifecycle,
+            createLocationListener(onProviderDisabledListener = {
                 onGpsDisabled()
-            }
-
-            override fun onProviderEnabled(provider: String) {
-
-            }
-
-            override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
-
-        })
-        lifecycleLocationListener.enable()
+            })
+        )
     }
 
     private fun initViewModel() {
@@ -154,13 +142,14 @@ class PhotoListActivity : AppCompatActivity() {
     }
 
     private fun stopLocationTracking() {
-        stopService(Intent(this, SynchronizationService::class.java))
+        stopService(Intent(this, LocationTrackingService::class.java))
         updateStartStopButtonState(false)
     }
 
     private fun startLocationTracking() {
         if(hasLocationPermission()) {
-            startService(Intent(this, SynchronizationService::class.java))
+            lifecycleLocationListener.enable()
+            startService(Intent(this, LocationTrackingService::class.java))
             updateStartStopButtonState(true)
         } else {
             requestLocationPermission()

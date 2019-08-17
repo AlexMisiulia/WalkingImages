@@ -5,14 +5,18 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import com.simplyfire.komoottesttask.core.data.PhotoRepository
 import com.simplyfire.komoottesttask.core.utils.Event
-import io.reactivex.android.schedulers.AndroidSchedulers
+import com.simplyfire.komoottesttask.core.utils.SchedulerProvider
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import javax.inject.Inject
 
 private const val TAG = "PhotoListViewModel"
 
-class PhotoListViewModel @Inject constructor(photoRepository: PhotoRepository) : ViewModel() {
+class PhotoListViewModel @Inject constructor(
+    photoRepository: PhotoRepository,
+    schedulerProvider: SchedulerProvider
+) : ViewModel() {
+
     val viewState: LiveData<ViewState> get() = _viewState
     private var _viewState = MediatorLiveData<ViewState>()
             // default value
@@ -21,7 +25,7 @@ class PhotoListViewModel @Inject constructor(photoRepository: PhotoRepository) :
 
     init {
         disposables += photoRepository.getPhotos()
-            .observeOn(AndroidSchedulers.mainThread())
+            .observeOn(schedulerProvider.main())
             .subscribe({ photos ->
                 val displayablePhotoList = photos.map { DisplayablePhoto(it.url_c) }
                 updateState {copy(photos = displayablePhotoList)}

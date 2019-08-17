@@ -35,7 +35,7 @@ class PhotoListActivity : AppCompatActivity() {
     @Inject lateinit var locationTracker: LocationTracker
     private lateinit var viewModel: PhotoListViewModel
 
-    private lateinit var startStopMenuItem: MenuItem
+    private var startStopMenuItem: MenuItem? = null
 
     private lateinit var lifecycleLocationListener: LifecycleLocationListener
 
@@ -52,7 +52,7 @@ class PhotoListActivity : AppCompatActivity() {
     private fun initLocationListener() {
         lifecycleLocationListener = LifecycleLocationListener(locationTracker, lifecycle,
             createLocationListener(onProviderDisabledListener = {
-                onGpsDisabled()
+                viewModel.onLocationDisabled()
             })
         )
     }
@@ -60,8 +60,33 @@ class PhotoListActivity : AppCompatActivity() {
     private fun initViewModel() {
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(PhotoListViewModel::class.java)
         viewModel.viewState.observe(this, Observer {
-            adapter.submitList(it.photos)
+            render(it)
         })
+    }
+
+    private fun render(it: PhotoListViewModel.ViewState) {
+        adapter.submitList(it.photos)
+
+        it.startLocationTracker.getContentIfNotHandled()?.let {
+            if(it) startLocationTracking()
+        }
+
+        it.stopLocationTracker.getContentIfNotHandled()?.let {
+            if(it) stopLocationTracking()
+        }
+
+        it.requestLocationPermission.getContentIfNotHandled()?.let {
+            if(it) requestLocationPermission()
+        }
+
+        updateStartStopButtonState(it.isLocationTrackingActive)
+
+        it.error.getContentIfNotHandled()?.let {
+            when (it) {
+                PhotoListViewModel.Error.LOCATION_PERMISSION_DENIED -> showLocationPermissionDenied()
+                PhotoListViewModel.Error.LOCATION_DISABLED -> showLocationDisabledError()
+            }
+        }
     }
 
     private fun initView() {
@@ -74,13 +99,13 @@ class PhotoListActivity : AppCompatActivity() {
 
     private fun updateStartStopButtonState(isLocationTrackingActive: Boolean) {
         if(isLocationTrackingActive) {
-            startStopMenuItem.title = getText(R.string.stop)
+            startStopMenuItem?.title = getText(R.string.stop)
         } else {
-            startStopMenuItem.title = getText(R.string.start)
+            startStopMenuItem?.title = getText(R.string.start)
         }
     }
 
-    private fun onDisabledLocationPermission() {
+    private fun showLocationPermissionDenied() {
         AlertDialog.Builder(this)
             .setMessage(R.string.location_permission_error_msg)
             .setNeutralButton(android.R.string.ok) { _, _ ->
@@ -88,7 +113,7 @@ class PhotoListActivity : AppCompatActivity() {
             }.show()
     }
 
-    private fun onGpsDisabled() {
+    private fun showLocationDisabledError() {
         AlertDialog.Builder(this)
             .setMessage(R.string.location_disabled_error_msg)
             .setNeutralButton(android.R.string.ok) { _, _ ->
@@ -102,9 +127,9 @@ class PhotoListActivity : AppCompatActivity() {
             LOCATION_PERMISSION_REQUEST_CODE -> {
                 // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    startLocationTracking()
+                    viewModel.onLocationPermissionGranted()
                 } else {
-                    onDisabledLocationPermission()
+                    viewModel.onLocationPermissionDenied()
                 }
                 return
             }
@@ -132,28 +157,21 @@ class PhotoListActivity : AppCompatActivity() {
         }
     }
 
-
     private fun onStartStopButtonClicked() {
-        when(startStopMenuItem.title) {
-            getString(R.string.start) -> startLocationTracking()
-            getString(R.string.stop) -> stopLocationTracking()
-            else -> throw IllegalArgumentException("Unknown button text=${startStopMenuItem.title}")
+        when(startStopMenuItem?.title) {
+            getString(R.string.start) -> viewModel.onStartClicked(hasLocationPermission())
+            getString(R.string.stop) -> viewModel.onStopClicked()
+            else -> throw IllegalArgumentException("Unknown button text=${startStopMenuItem?.title}")
         }
     }
 
     private fun stopLocationTracking() {
         stopService(Intent(this, LocationTrackingService::class.java))
-        updateStartStopButtonState(false)
     }
 
     private fun startLocationTracking() {
-        if(hasLocationPermission()) {
-            lifecycleLocationListener.enable()
-            startService(Intent(this, LocationTrackingService::class.java))
-            updateStartStopButtonState(true)
-        } else {
-            requestLocationPermission()
-        }
+        lifecycleLocationListener.enable()
+        startService(Intent(this, LocationTrackingService::class.java))
     }
 
     private fun requestLocationPermission() {

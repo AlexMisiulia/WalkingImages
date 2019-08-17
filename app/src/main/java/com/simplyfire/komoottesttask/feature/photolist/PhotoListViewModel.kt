@@ -35,7 +35,7 @@ class PhotoListViewModel @Inject constructor(
     }
 
     fun onLocationPermissionGranted() {
-        updateState{copy(startLocationTracker = Event(true), isLocationTrackingActive = true)}
+        updateState{copy( startLocationTracker = Event(true), isLocationTrackingActive = true)}
     }
 
     fun onLocationPermissionDenied() {
@@ -54,8 +54,10 @@ class PhotoListViewModel @Inject constructor(
         }
     }
 
-    fun onLocationDisabled() {
-        updateState{copy(error = Event(Error.LOCATION_DISABLED))}
+    fun onLocationAvailable(isAvailable: Boolean) {
+        if(!isAvailable) {
+            updateState{copy(error = Event(Error.LOCATION_DISABLED))}
+        }
     }
 
     private fun updateState(block: ViewState.() -> ViewState) {

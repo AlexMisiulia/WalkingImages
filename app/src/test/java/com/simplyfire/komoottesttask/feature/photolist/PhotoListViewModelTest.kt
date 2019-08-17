@@ -77,7 +77,7 @@ class PhotoListViewModelTest: BaseViewModelTest() {
         val viewModel = PhotoListViewModel(photoRepository, TestSchedulerProvider())
 
         //act
-        viewModel.onLocationDisabled()
+        viewModel.onLocationAvailable(false)
 
         //assert
         val expected = PhotoListViewModel.ViewState(error = Event(PhotoListViewModel.Error.LOCATION_DISABLED))

@@ -3,6 +3,8 @@ package com.simplyfire.komoottesttask.core.di
 import android.content.Context
 import android.location.LocationManager
 import androidx.room.Room
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.simplyfire.komoottesttask.core.data.db.AppDatabase
 import com.simplyfire.komoottesttask.core.data.db.DATABASE_NAME
 import com.simplyfire.komoottesttask.core.network.API_BASE_URL
@@ -60,5 +62,11 @@ class AppModule(private val context: Context) {
     @Provides
     fun providesLocationManager(context: Context): LocationManager {
         return context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    }
+
+    @Singleton
+    @Provides
+    fun providesFusedLocationManager(context: Context): FusedLocationProviderClient {
+        return LocationServices.getFusedLocationProviderClient(context)
     }
 }

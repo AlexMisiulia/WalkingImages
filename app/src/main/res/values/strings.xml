@@ -2,10 +2,13 @@
     <string name="app_name">Walking images</string>
     <string name="notification_title">Walking images is active. Click for more details</string>
     <string name="notification_text">Received new photo at %s. Check it now!</string>
-    <string name="location_permission_error_msg">This app can\'t work without this permission. Please grant it.</string>
+    <string name="location_permission_hint">We need location permissions to take photos during your trip. Please grant it.</string>
+    <string name="location_permission_error">Sorry, we can\'t continue without location permissions.
+        Now you will be redirected to the app settings page. You need to grant location permission. See you soon!
+    </string>
     <string name="location_disabled_error_msg">Gps is turned off. Please turn it on.</string>
     <string name="general_error">Something goes wrong.</string>
-    <string name="service_text">Walking with images is running</string>
+    <string name="service_text">Walking images is running</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
 </resources>

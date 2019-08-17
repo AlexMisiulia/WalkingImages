@@ -1,6 +1,5 @@
 package com.simplyfire.komoottesttask.core.gps
 
-import android.location.LocationListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -8,7 +7,7 @@ import androidx.lifecycle.OnLifecycleEvent
 
 class LifecycleLocationListener(private val locationTracker: LocationTracker,
                                          private val lifecycle: Lifecycle,
-                                         private val callback: LocationListener) :
+                                         private val callback: LocationObserver) :
     LifecycleObserver {
     private var enabled = false
 
@@ -32,6 +31,6 @@ class LifecycleLocationListener(private val locationTracker: LocationTracker,
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun stop() {
-        locationTracker.removeLocationListener(callback)
+        locationTracker.removeLocationListener()
     }
 }

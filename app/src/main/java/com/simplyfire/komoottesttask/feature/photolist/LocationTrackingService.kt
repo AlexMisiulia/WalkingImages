@@ -12,16 +12,16 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.simplyfire.komoottesttask.BuildConfig
-import com.simplyfire.komoottesttask.core.data.PhotoRepository
 import com.simplyfire.komoottesttask.core.di.Injector
 import com.simplyfire.komoottesttask.core.gps.LocationTracker
-import com.simplyfire.komoottesttask.core.utils.createLocationListener
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 import android.app.PendingIntent
 import android.location.Location
 import com.simplyfire.komoottesttask.R
+import com.simplyfire.komoottesttask.core.domain.SearchPhoto
+import com.simplyfire.komoottesttask.core.gps.createLocationObserver
 import com.simplyfire.komoottesttask.core.utils.formatDate
 import com.simplyfire.komoottesttask.core.utils.notificationFormat
 import io.reactivex.disposables.CompositeDisposable
@@ -35,7 +35,7 @@ private const val NOTIFICATIONS_CHANNEL_NAME = "Waling images service"
 private const val TAG = "LocationTrackingService"
 
 class LocationTrackingService : Service() {
-    @Inject lateinit var photoRepository: PhotoRepository
+    @Inject lateinit var searchPhoto: SearchPhoto
     @Inject lateinit var locationTracker: LocationTracker
 
     private val disposables = CompositeDisposable()
@@ -44,7 +44,7 @@ class LocationTrackingService : Service() {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    private val locationListener = createLocationListener(onLocationChangedListener = {
+    private val locationListener = createLocationObserver(onLocationUpdated = {
         searchPhoto(it)
     })
 
@@ -56,7 +56,7 @@ class LocationTrackingService : Service() {
     }
 
     private fun searchPhoto(it: Location) {
-        disposables += photoRepository.searchPhoto(it.latitude.toString(), it.longitude.toString())
+        disposables += searchPhoto.execute(it.latitude.toString(), it.longitude.toString())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onNext = {
                 onReceivedPhoto()
@@ -113,7 +113,7 @@ class LocationTrackingService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        locationTracker.removeLocationListener(locationListener)
+        locationTracker.removeLocationListener()
         disposables.clear()
     }
 }

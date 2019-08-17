@@ -3,8 +3,8 @@ package com.simplyfire.komoottesttask.feature.photolist
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
-import android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
@@ -15,17 +15,17 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.simplyfire.komoottesttask.R
 import com.simplyfire.komoottesttask.core.di.Injector
 import com.simplyfire.komoottesttask.core.di.ViewModelFactory
-import com.simplyfire.komoottesttask.core.gps.LifecycleLocationListener
-import com.simplyfire.komoottesttask.core.gps.LocationTracker
-import com.simplyfire.komoottesttask.core.utils.createLocationListener
+import com.simplyfire.komoottesttask.core.gps.*
 import kotlinx.android.synthetic.main.activity_main.*
-import java.lang.IllegalArgumentException
 import javax.inject.Inject
+import com.simplyfire.komoottesttask.R
+import com.simplyfire.komoottesttask.core.utils.startAppSettingsActivity
+
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 777
+private const val ENABLE_LOCATION_SETTINGS_REQUEST_CODE = 888
 private const val TAG = "PhotoListActivity"
 
 class PhotoListActivity : AppCompatActivity() {
@@ -50,9 +50,11 @@ class PhotoListActivity : AppCompatActivity() {
     }
 
     private fun initLocationListener() {
-        lifecycleLocationListener = LifecycleLocationListener(locationTracker, lifecycle,
-            createLocationListener(onProviderDisabledListener = {
-                viewModel.onLocationDisabled()
+        lifecycleLocationListener = LifecycleLocationListener(
+            locationTracker,
+            lifecycle,
+            createLocationObserver(onLocationAvailable = {
+                viewModel.onLocationAvailable(it)
             })
         )
     }
@@ -84,9 +86,19 @@ class PhotoListActivity : AppCompatActivity() {
         it.error.getContentIfNotHandled()?.let {
             when (it) {
                 PhotoListViewModel.Error.LOCATION_PERMISSION_DENIED -> showLocationPermissionDenied()
-                PhotoListViewModel.Error.LOCATION_DISABLED -> showLocationDisabledError()
+                PhotoListViewModel.Error.LOCATION_DISABLED -> checkLocationEnabled()
             }
         }
+    }
+
+    private fun checkLocationEnabled() {
+        checkLocationSettings(this,
+            onSuccessResult = {
+                viewModel.onLocationAvailable(true)
+            }, onFailureListener = { error ->
+                requestLocationEnabling(error, this, ENABLE_LOCATION_SETTINGS_REQUEST_CODE)
+            }
+        )
     }
 
     private fun initView() {
@@ -106,19 +118,27 @@ class PhotoListActivity : AppCompatActivity() {
     }
 
     private fun showLocationPermissionDenied() {
-        AlertDialog.Builder(this)
-            .setMessage(R.string.location_permission_error_msg)
-            .setNeutralButton(android.R.string.ok) { _, _ ->
-                startActivity(Intent(ACTION_LOCATION_SOURCE_SETTINGS))
-            }.show()
-    }
 
-    private fun showLocationDisabledError() {
-        AlertDialog.Builder(this)
-            .setMessage(R.string.location_disabled_error_msg)
-            .setNeutralButton(android.R.string.ok) { _, _ ->
-                startActivity(Intent(ACTION_LOCATION_SOURCE_SETTINGS))
-            }.show()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            val permanentlyDenied = shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
+            if (permanentlyDenied) {
+                AlertDialog.Builder(this)
+                    .setMessage(R.string.location_permission_error)
+                    .setNeutralButton(android.R.string.ok) { _, _ ->
+                        startAppSettingsActivity()
+                    }.show()
+            } else {
+
+                AlertDialog.Builder(this)
+                    .setMessage(R.string.location_permission_hint)
+                    .setNeutralButton(android.R.string.ok) { _, _ ->
+                        requestLocationPermission()
+                    }.show()
+            }
+
+        } // else can't be because permissions starts from Build.VERSION_CODES.M
+
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
@@ -177,10 +197,7 @@ class PhotoListActivity : AppCompatActivity() {
     private fun requestLocationPermission() {
         ActivityCompat.requestPermissions(
             this,
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ),
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
             LOCATION_PERMISSION_REQUEST_CODE
         )
     }

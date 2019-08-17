@@ -35,7 +35,7 @@ class PhotoListViewModel @Inject constructor(
     }
 
     fun onLocationPermissionGranted() {
-        updateState{copy(startLocationTracker = Event(true))}
+        updateState{copy(startLocationTracker = Event(true), isLocationTrackingActive = true)}
     }
 
     fun onLocationPermissionDenied() {

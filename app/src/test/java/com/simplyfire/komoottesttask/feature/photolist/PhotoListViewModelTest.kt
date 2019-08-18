@@ -1,6 +1,6 @@
 package com.simplyfire.komoottesttask.feature.photolist
 
-import com.simplyfire.komoottesttask.core.data.PhotoRepository
+import com.simplyfire.komoottesttask.core.domain.PhotoRepository
 import com.simplyfire.komoottesttask.core.entity.Photo
 import com.simplyfire.komoottesttask.core.utils.Event
 import com.simplyfire.komoottesttask.testutils.BaseViewModelTest

@@ -1,4 +1,4 @@
-package com.simplyfire.komoottesttask.core.di
+package com.simplyfire.komoottesttask.core.di.module
 
 import com.simplyfire.komoottesttask.core.utils.AndroidSchedulerProvider
 import com.simplyfire.komoottesttask.core.utils.SchedulerProvider

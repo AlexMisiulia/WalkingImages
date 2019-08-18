@@ -1,4 +1,4 @@
-package com.simplyfire.komoottesttask.core.network
+package com.simplyfire.komoottesttask.core.data.network
 
 import com.simplyfire.komoottesttask.core.entity.SearchPhotosResponse
 import io.reactivex.Observable

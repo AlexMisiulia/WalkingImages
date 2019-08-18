@@ -2,6 +2,7 @@
 package com.simplyfire.komoottesttask.core.di
 
 import android.content.Context
+import com.simplyfire.komoottesttask.core.di.module.AppModule
 
 
 @Suppress("ObjectPropertyName")

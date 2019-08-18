@@ -1,4 +1,4 @@
-package com.simplyfire.komoottesttask.core.gps
+package com.simplyfire.komoottesttask.core.platform.location
 
 import android.location.Location
 

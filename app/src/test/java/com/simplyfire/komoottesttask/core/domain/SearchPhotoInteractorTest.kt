@@ -1,21 +1,22 @@
 package com.simplyfire.komoottesttask.core.domain
 
-import com.simplyfire.komoottesttask.core.data.PhotoRepository
 import com.simplyfire.komoottesttask.core.entity.Photo
 import com.simplyfire.komoottesttask.core.entity.Photos
 import com.simplyfire.komoottesttask.core.entity.SearchPhotosResponse
+import com.simplyfire.komoottesttask.feature.locationtracking.SearchPhotoInteractor
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
-class SearchPhotoTest {
+class SearchPhotoInteractorTest {
     private val lattitude = "123"
     private val longitude = "1234"
 
     private val photoRepository = mock(PhotoRepository::class.java)
-    private val searchPhoto = SearchPhoto(photoRepository)
+    private val searchPhoto =
+        SearchPhotoInteractor(photoRepository)
 
     @Test
     fun `Emit first photo when repository respond with non-empty list`() {

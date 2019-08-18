@@ -17,11 +17,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.simplyfire.komoottesttask.core.di.Injector
 import com.simplyfire.komoottesttask.core.di.ViewModelFactory
-import com.simplyfire.komoottesttask.core.data.gps.*
+import com.simplyfire.komoottesttask.core.platform.location.*
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 import com.simplyfire.komoottesttask.R
 import com.simplyfire.komoottesttask.core.utils.startAppSettingsActivity
+import com.simplyfire.komoottesttask.feature.locationtracking.LocationTrackingService
 
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 777

@@ -1,4 +1,4 @@
-package com.simplyfire.komoottesttask.feature.photolist
+package com.simplyfire.komoottesttask.feature.locationtracking
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -13,17 +13,17 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.simplyfire.komoottesttask.BuildConfig
 import com.simplyfire.komoottesttask.core.di.Injector
-import com.simplyfire.komoottesttask.core.data.gps.LocationTracker
+import com.simplyfire.komoottesttask.core.platform.location.LocationTracker
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 import android.app.PendingIntent
 import android.location.Location
 import com.simplyfire.komoottesttask.R
-import com.simplyfire.komoottesttask.core.domain.SearchPhoto
-import com.simplyfire.komoottesttask.core.data.gps.createLocationObserver
+import com.simplyfire.komoottesttask.core.platform.location.createLocationObserver
 import com.simplyfire.komoottesttask.core.utils.formatDate
 import com.simplyfire.komoottesttask.core.utils.notificationFormat
+import com.simplyfire.komoottesttask.feature.photolist.PhotoListActivity
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import java.util.*
@@ -43,7 +43,7 @@ class LocationTrackingService : Service() {
         private var isServiceRunningInternal = false
     }
 
-    @Inject lateinit var searchPhoto: SearchPhoto
+    @Inject lateinit var searchPhotoInteractor: SearchPhotoInteractor
     @Inject lateinit var locationTracker: LocationTracker
 
     private val disposables = CompositeDisposable()
@@ -65,7 +65,7 @@ class LocationTrackingService : Service() {
     }
 
     private fun searchPhoto(it: Location) {
-        disposables += searchPhoto.execute(it.latitude.toString(), it.longitude.toString())
+        disposables += searchPhotoInteractor.execute(it.latitude.toString(), it.longitude.toString())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onNext = {
                 onReceivedPhoto()
@@ -98,7 +98,9 @@ class LocationTrackingService : Service() {
             0,
             Intent(this, PhotoListActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT
         )
-        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        return NotificationCompat.Builder(this,
+            NOTIFICATION_CHANNEL_ID
+        )
             .setContentTitle(title)
             .setContentText(text)
             .setContentIntent(contentIntent)

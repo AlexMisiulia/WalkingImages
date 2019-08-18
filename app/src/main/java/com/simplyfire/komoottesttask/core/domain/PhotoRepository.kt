@@ -1,4 +1,4 @@
-package com.simplyfire.komoottesttask.core.data
+package com.simplyfire.komoottesttask.core.domain
 
 import com.simplyfire.komoottesttask.core.data.db.PhotosDao
 import com.simplyfire.komoottesttask.core.entity.Photo

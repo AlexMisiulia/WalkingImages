@@ -2,6 +2,7 @@ package com.simplyfire.komoottesttask.core.data
 
 import com.simplyfire.komoottesttask.core.data.db.PhotosDao
 import com.simplyfire.komoottesttask.core.data.network.FlickrApi
+import com.simplyfire.komoottesttask.core.domain.PhotoRepository
 import com.simplyfire.komoottesttask.core.entity.Photo
 import com.simplyfire.komoottesttask.core.entity.SearchPhotosResponse
 import com.simplyfire.komoottesttask.testutils.TestSchedulerProvider
@@ -16,7 +17,8 @@ class PhotoRepositoryTest {
 
     private val flickrApi = mock(FlickrApi::class.java)
     private val photosDao = mock(PhotosDao::class.java)
-    private val photoRepository = PhotoRepository(flickrApi, photosDao, TestSchedulerProvider())
+    private val photoRepository =
+        PhotoRepository(flickrApi, photosDao, TestSchedulerProvider())
 
     @Test
     fun `Search photos using server`() {

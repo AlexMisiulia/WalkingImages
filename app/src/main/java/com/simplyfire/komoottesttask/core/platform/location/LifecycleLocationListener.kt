@@ -1,4 +1,4 @@
-package com.simplyfire.komoottesttask.core.gps
+package com.simplyfire.komoottesttask.core.platform.location
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver

@@ -3,7 +3,7 @@ package com.simplyfire.komoottesttask.feature.photolist
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import com.simplyfire.komoottesttask.core.data.PhotoRepository
+import com.simplyfire.komoottesttask.core.domain.PhotoRepository
 import com.simplyfire.komoottesttask.core.utils.Event
 import com.simplyfire.komoottesttask.core.utils.SchedulerProvider
 import io.reactivex.disposables.CompositeDisposable

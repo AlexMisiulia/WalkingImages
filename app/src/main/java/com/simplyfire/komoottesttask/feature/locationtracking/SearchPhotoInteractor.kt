@@ -1,14 +1,14 @@
-package com.simplyfire.komoottesttask.core.domain
+package com.simplyfire.komoottesttask.feature.locationtracking
 
 import android.util.Log
-import com.simplyfire.komoottesttask.core.data.PhotoRepository
+import com.simplyfire.komoottesttask.core.domain.PhotoRepository
 import com.simplyfire.komoottesttask.core.entity.Photo
 import io.reactivex.Observable
 import javax.inject.Inject
 
-private const val TAG = "SearchPhoto"
+private const val TAG = "SearchPhotoInteractor"
 
-class SearchPhoto @Inject constructor(private val photoRepository: PhotoRepository){
+class SearchPhotoInteractor @Inject constructor(private val photoRepository: PhotoRepository){
 
     @Suppress("FoldInitializerAndIfToElvis")
     fun execute(latitude: String, longitude: String): Observable<Photo> {

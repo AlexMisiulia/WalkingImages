@@ -26,6 +26,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -63,6 +67,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$mockito_core_version"
     testImplementation "org.mockito:mockito-inline:$mockito_core_version"
 
-    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation "android.arch.core:core-testing:$lifecycle_version"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
 }

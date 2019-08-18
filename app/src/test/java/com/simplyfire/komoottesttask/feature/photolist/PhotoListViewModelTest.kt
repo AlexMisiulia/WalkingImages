@@ -1,6 +1,7 @@
 package com.simplyfire.komoottesttask.feature.photolist
 
 import com.simplyfire.komoottesttask.core.data.PhotoRepository
+import com.simplyfire.komoottesttask.core.entity.Photo
 import com.simplyfire.komoottesttask.core.utils.Event
 import com.simplyfire.komoottesttask.testutils.BaseViewModelTest
 import com.simplyfire.komoottesttask.testutils.TestSchedulerProvider
@@ -123,6 +124,22 @@ class PhotoListViewModelTest: BaseViewModelTest() {
 
         //assert
         val expected = PhotoListViewModel.ViewState(isLocationTrackingActive = false)
+        assertEquals(expected, viewModel.viewState.value)
+    }
+
+    @Test
+    fun `Display photos received from repository`() {
+        //arrange
+        `when`(photoRepository.getPhotos()).thenReturn(
+            Observable.just(listOf(Photo(url_c = "url")))
+        )
+        val viewModel = PhotoListViewModel(photoRepository, TestSchedulerProvider())
+
+        //act
+        viewModel.init(false)
+
+        //assert
+        val expected = PhotoListViewModel.ViewState(photos = listOf(DisplayablePhoto("url")))
         assertEquals(expected, viewModel.viewState.value)
     }
 

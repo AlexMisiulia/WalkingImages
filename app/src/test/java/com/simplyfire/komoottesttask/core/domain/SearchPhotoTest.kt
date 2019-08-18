@@ -5,6 +5,7 @@ import com.simplyfire.komoottesttask.core.entity.Photo
 import com.simplyfire.komoottesttask.core.entity.Photos
 import com.simplyfire.komoottesttask.core.entity.SearchPhotosResponse
 import io.reactivex.Observable
+import io.reactivex.Single
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
@@ -19,20 +20,25 @@ class SearchPhotoTest {
     @Test
     fun `Emit first photo when repository respond with non-empty list`() {
        //arrange
-       `when`(photoRepository.searchPhotos(lattitude, longitude)).thenReturn(
+        val photo = Photo(pkeyId = 1, url_c = "url1")
+        `when`(photoRepository.searchPhotos(lattitude, longitude)).thenReturn(
            Observable.just(SearchPhotosResponse(
                photos = Photos(photo = listOf(
-                   Photo(pkeyId = 1, url_c = "url1"),
+                   photo,
                    Photo(pkeyId = 2, url_c = "url2")
                ))
            ))
        )
 
+        `when`(photoRepository.insertPhoto(photo)).thenReturn(
+            Single.just(photo)
+        )
+
        //act
         val result = searchPhoto.execute(lattitude, longitude)
 
         //assert
-        result.test().assertResult(Photo(pkeyId = 1, url_c = "url1"))
+        result.test().assertResult(photo)
     }
 
     @Test

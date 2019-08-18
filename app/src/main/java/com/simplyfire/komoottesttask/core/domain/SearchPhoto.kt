@@ -16,12 +16,11 @@ class SearchPhoto @Inject constructor(private val photoRepository: PhotoReposito
 
         return photoRepository.searchPhotos(latitude, longitude)
             .flatMap { photoResponse ->
-                val closestPhoto = photoResponse.photos.photo.getOrNull(0)
+                val closestPhoto    = photoResponse.photos.photo.getOrNull(0)
                 Log.d(TAG, "execute, received photo, closestPhoto=$closestPhoto")
                 if (closestPhoto == null) return@flatMap Observable.empty<Photo>()
 
-                photoRepository.insertPhoto(closestPhoto)
-                return@flatMap Observable.just(closestPhoto)
+                return@flatMap photoRepository.insertPhoto(closestPhoto).toObservable()
             }
     }
 }

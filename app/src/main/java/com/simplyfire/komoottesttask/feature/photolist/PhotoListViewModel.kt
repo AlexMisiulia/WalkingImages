@@ -71,6 +71,10 @@ class PhotoListViewModel @Inject constructor(
         disposables.clear()
     }
 
+    fun init(isLocationTrackingActive: Boolean) {
+        updateState{copy(isLocationTrackingActive = isLocationTrackingActive)}
+    }
+
     data class ViewState(
         val photos: List<DisplayablePhoto> = listOf(),
         val isLocationTrackingActive: Boolean = false,

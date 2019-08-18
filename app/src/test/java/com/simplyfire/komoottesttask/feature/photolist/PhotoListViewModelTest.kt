@@ -98,4 +98,32 @@ class PhotoListViewModelTest: BaseViewModelTest() {
         assertEquals(expected, viewModel.viewState.value)
     }
 
+    @Test
+    fun `Show location tracking is active state when init while tracking is active`() {
+        //arrange
+        `when`(photoRepository.getPhotos()).thenReturn(Observable.empty())
+        val viewModel = PhotoListViewModel(photoRepository, TestSchedulerProvider())
+
+        //act
+        viewModel.init(true)
+
+        //assert
+        val expected = PhotoListViewModel.ViewState(isLocationTrackingActive = true)
+        assertEquals(expected, viewModel.viewState.value)
+    }
+
+    @Test
+    fun `Show location tracking is not active state when init while tracking is not active`() {
+        //arrange
+        `when`(photoRepository.getPhotos()).thenReturn(Observable.empty())
+        val viewModel = PhotoListViewModel(photoRepository, TestSchedulerProvider())
+
+        //act
+        viewModel.init(false)
+
+        //assert
+        val expected = PhotoListViewModel.ViewState(isLocationTrackingActive = false)
+        assertEquals(expected, viewModel.viewState.value)
+    }
+
 }

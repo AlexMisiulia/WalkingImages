@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.simplyfire.komoottesttask.core.di.Injector
 import com.simplyfire.komoottesttask.core.di.ViewModelFactory
-import com.simplyfire.komoottesttask.core.gps.*
+import com.simplyfire.komoottesttask.core.data.gps.*
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 import com.simplyfire.komoottesttask.R
@@ -64,6 +64,8 @@ class PhotoListActivity : AppCompatActivity() {
         viewModel.viewState.observe(this, Observer {
             render(it)
         })
+
+        viewModel.init(LocationTrackingService.isServiceRunning)
     }
 
     private fun render(it: PhotoListViewModel.ViewState) {

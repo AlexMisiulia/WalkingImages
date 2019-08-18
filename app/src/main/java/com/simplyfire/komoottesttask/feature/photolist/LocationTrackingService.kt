@@ -13,7 +13,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.simplyfire.komoottesttask.BuildConfig
 import com.simplyfire.komoottesttask.core.di.Injector
-import com.simplyfire.komoottesttask.core.gps.LocationTracker
+import com.simplyfire.komoottesttask.core.data.gps.LocationTracker
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
@@ -21,7 +21,7 @@ import android.app.PendingIntent
 import android.location.Location
 import com.simplyfire.komoottesttask.R
 import com.simplyfire.komoottesttask.core.domain.SearchPhoto
-import com.simplyfire.komoottesttask.core.gps.createLocationObserver
+import com.simplyfire.komoottesttask.core.data.gps.createLocationObserver
 import com.simplyfire.komoottesttask.core.utils.formatDate
 import com.simplyfire.komoottesttask.core.utils.notificationFormat
 import io.reactivex.disposables.CompositeDisposable
@@ -35,6 +35,14 @@ private const val NOTIFICATIONS_CHANNEL_NAME = "Waling images service"
 private const val TAG = "LocationTrackingService"
 
 class LocationTrackingService : Service() {
+
+    companion object {
+        // not very clean but working solution to track if service is active
+        // link: https://groups.google.com/forum/#!topic/android-developers/jEvXMWgbgzE
+        val isServiceRunning: Boolean get() = isServiceRunningInternal
+        private var isServiceRunningInternal = false
+    }
+
     @Inject lateinit var searchPhoto: SearchPhoto
     @Inject lateinit var locationTracker: LocationTracker
 
@@ -51,6 +59,7 @@ class LocationTrackingService : Service() {
     override fun onCreate() {
         super.onCreate()
         Injector.appComponent.inject(this)
+        isServiceRunningInternal = true
         startForeground(NOTIFICATION_ID, buildNotification(initChannel = true))
         locationTracker.observeLocationChanges(locationListener)
     }
@@ -113,6 +122,7 @@ class LocationTrackingService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        isServiceRunningInternal = false
         locationTracker.removeLocationListener()
         disposables.clear()
     }

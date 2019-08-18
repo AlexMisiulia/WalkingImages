@@ -106,7 +106,7 @@ class PhotoListViewModelTest: BaseViewModelTest() {
         val viewModel = PhotoListViewModel(photoRepository, TestSchedulerProvider())
 
         //act
-        viewModel.init(true)
+        viewModel.setLocationTrackingState(true)
 
         //assert
         val expected = PhotoListViewModel.ViewState(isLocationTrackingActive = true)
@@ -120,7 +120,7 @@ class PhotoListViewModelTest: BaseViewModelTest() {
         val viewModel = PhotoListViewModel(photoRepository, TestSchedulerProvider())
 
         //act
-        viewModel.init(false)
+        viewModel.setLocationTrackingState(false)
 
         //assert
         val expected = PhotoListViewModel.ViewState(isLocationTrackingActive = false)
@@ -136,7 +136,7 @@ class PhotoListViewModelTest: BaseViewModelTest() {
         val viewModel = PhotoListViewModel(photoRepository, TestSchedulerProvider())
 
         //act
-        viewModel.init(false)
+        viewModel.setLocationTrackingState(false)
 
         //assert
         val expected = PhotoListViewModel.ViewState(photos = listOf(DisplayablePhoto("url")))

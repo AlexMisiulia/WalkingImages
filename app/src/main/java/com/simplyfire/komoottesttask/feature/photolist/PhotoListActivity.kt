@@ -65,8 +65,6 @@ class PhotoListActivity : AppCompatActivity() {
         viewModel.viewState.observe(this, Observer {
             render(it)
         })
-
-        viewModel.init(LocationTrackingService.isServiceRunning)
     }
 
     private fun render(it: PhotoListViewModel.ViewState) {
@@ -167,6 +165,7 @@ class PhotoListActivity : AppCompatActivity() {
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         startStopMenuItem = menu.findItem(R.id.start_stop_button)
+        viewModel.setLocationTrackingState(LocationTrackingService.isServiceRunning)
         return super.onPrepareOptionsMenu(menu)
     }
 

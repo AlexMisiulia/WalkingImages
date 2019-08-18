@@ -71,7 +71,7 @@ class PhotoListViewModel @Inject constructor(
         disposables.clear()
     }
 
-    fun init(isLocationTrackingActive: Boolean) {
+    fun setLocationTrackingState(isLocationTrackingActive: Boolean) {
         updateState{copy(isLocationTrackingActive = isLocationTrackingActive)}
     }
 

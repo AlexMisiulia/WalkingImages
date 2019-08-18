@@ -122,7 +122,7 @@ class PhotoListActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-            val permanentlyDenied = shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
+            val permanentlyDenied = !shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
             if (permanentlyDenied) {
                 AlertDialog.Builder(this)
                     .setMessage(R.string.location_permission_error)
@@ -138,7 +138,7 @@ class PhotoListActivity : AppCompatActivity() {
                     }.show()
             }
 
-        } // else can't be because permissions starts from Build.VERSION_CODES.M
+        } // else can't be because permissions start from Build.VERSION_CODES.M
 
     }
 
